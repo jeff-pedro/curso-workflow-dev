@@ -1,14 +1,17 @@
 /* eslint-disable no-unused-expressions */
 import chai from 'chai';
 import chaiHttp from 'chai-http';
+import sinon from 'sinon';
 import app from '../../app.js';
+import EventosController from '../../controllers/eventosController.js';
 
 chai.use(chaiHttp);
 const { expect } = chai;
+let stub;
 
 describe('GET em eventos', () => {
   it('Deve retornar uma lista de eventos', (done) => {
-    process.env.EVENTO_FLAG = 'true';
+    stub = sinon.stub(EventosController, 'liberaAcessoEvento').returns(true);
     chai.request(app)
       .get('/eventos')
       .set('Accept', 'application/json')
@@ -24,7 +27,8 @@ describe('GET em eventos', () => {
   });
 
   it('Deve retornar erro 404', (done) => {
-    process.env.EVENTO_FLAG = 'false';
+    stub.restore();
+    stub = sinon.stub(EventosController, 'liberaAcessoEvento').returns(false);
     chai.request(app)
       .get('/eventos')
       .set('Accept', 'application/json')
